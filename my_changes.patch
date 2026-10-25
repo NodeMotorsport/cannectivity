@@ -1,0 +1,93 @@
+diff --git a/app/boards/usb2can_h523cc.conf b/app/boards/usb2can_h523cc.conf
+new file mode 100644
+index 0000000..2453d3b
+--- /dev/null
++++ b/app/boards/usb2can_h523cc.conf
+@@ -0,0 +1,17 @@
++# NodeMotorsport USB branding
++CONFIG_CANNECTIVITY_USB_MANUFACTURER="NodeMotorsport"
++CONFIG_CANNECTIVITY_USB_PRODUCT="NodeMotorsport USB2CANFD"
++
++# CAN FD support
++CONFIG_CAN=y
++CONFIG_CAN_FD_MODE=y
++
++# SWO logging (keep your existing debug settings)
++CONFIG_LOG=y
++CONFIG_LOG_BACKEND_SWO=y
++
++# Enable GPIO-controlled CAN termination
++CONFIG_CANNECTIVITY_TERMINATION_GPIO=y
++
++# Termination OFF after boot
++CONFIG_CANNECTIVITY_TERMINATION_DEFAULT_ON=n
+\ No newline at end of file
+diff --git a/app/boards/usb2can_h523cc.overlay b/app/boards/usb2can_h523cc.overlay
+new file mode 100644
+index 0000000..4b16fc1
+--- /dev/null
++++ b/app/boards/usb2can_h523cc.overlay
+@@ -0,0 +1,43 @@
++
++/*
++ * NodeMotorsport USB2CAN STM32H523
++ */
++
++#include "../app.overlay"
++
++/ {
++    cannectivity: cannectivity {
++        compatible = "cannectivity";
++
++        channel0 {
++            compatible = "cannectivity-channel";
++
++            /* CAN controller */
++            can-controller = <&fdcan2>;
++
++            /* Green - CAN running */
++            state-led = <&green_led>;
++
++            /* Red - CAN error */
++            error-led = <&red_led>;
++
++            /* Blue - CAN RX/TX activity */
++            activity-leds = <&blue_led>;
++
++            /* Switchable 120 ohm termination - PA15 */
++            termination-gpios = <&gpioa 15 GPIO_ACTIVE_HIGH>;
++        };
++
++        timestamp-counter = <&counter2>;
++    };
++};
++
++&timers2 {
++	status = "okay";
++	st,prescaler = <159>;
++
++	counter2: counter2 {
++		compatible = "st,stm32-counter";
++		status = "okay";
++	};
++};
+diff --git a/app/prj.conf b/app/prj.conf
+index 7ee5cde..225ea8b 100644
+--- a/app/prj.conf
++++ b/app/prj.conf
+@@ -13,3 +13,14 @@ CONFIG_OVERRIDE_FRAME_POINTER_DEFAULT=y
+ 
+ # Arm-specific hardened configuration
+ CONFIG_FAULT_DUMP=0
++
++CONFIG_PRINTK=y
++CONFIG_LOG=y
++CONFIG_LOG_PRINTK=y
++
++CONFIG_LOG_BACKEND_SWO=y
++CONFIG_LOG_BACKEND_SWO_FREQ_HZ=2000000
++
++# Disable UART logging
++CONFIG_LOG_BACKEND_UART=n
++CONFIG_UART_CONSOLE=n
+\ No newline at end of file

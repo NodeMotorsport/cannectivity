@@ -1,0 +1,43 @@
+
+/*
+ * NodeMotorsport USB2CAN STM32H523
+ */
+
+#include "../app.overlay"
+
+/ {
+    cannectivity: cannectivity {
+        compatible = "cannectivity";
+
+        channel0 {
+            compatible = "cannectivity-channel";
+
+            /* CAN controller */
+            can-controller = <&fdcan2>;
+
+            /* Green - CAN running */
+            state-led = <&green_led>;
+
+            /* Red - CAN error */
+            error-led = <&red_led>;
+
+            /* Blue - CAN RX/TX activity */
+            activity-leds = <&blue_led>;
+
+            /* Switchable 120 ohm termination - PA15 */
+            termination-gpios = <&gpioa 15 GPIO_ACTIVE_HIGH>;
+        };
+
+        timestamp-counter = <&counter2>;
+    };
+};
+
+&timers2 {
+	status = "okay";
+	st,prescaler = <159>;
+
+	counter2: counter2 {
+		compatible = "st,stm32-counter";
+		status = "okay";
+	};
+};
